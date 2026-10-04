@@ -1,0 +1,11 @@
+@import "tailwindcss";
+/* Html2canvas Tailwind Color Crash Fix */
+[id^="ticket-card-"],
+[id^="ticket-card-"] * {
+  border-color: #334155 !important;
+}
+
+[id^="ticket-card-"] {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
