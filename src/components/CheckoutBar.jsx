@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useSeatStore } from '../store/useSeatStore';
 import { useAuthStore } from '../store/useAuthStore';
 
+// ✅ Base API URL declaration
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
 // Helper function to dynamically load Razorpay checkout script
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -27,7 +30,8 @@ export default function CheckoutBar({ onProceed, activeShowtime }) {
   // 💳 Function to save booking after successful payment
   const saveBookingToDB = async (paymentId) => {
     try {
-      const res = await fetch('http://localhost:4000/api/bookings', {
+      // ✅ FIX: Clean template literal URL usage
+      const res = await fetch(`${API_URL}/api/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -45,7 +49,6 @@ export default function CheckoutBar({ onProceed, activeShowtime }) {
       const data = await res.json();
 
       if (res.ok) {
-        // Clear selected seats state if store provides method or fallback empty
         if (typeof clearSelectedSeats === 'function') {
           clearSelectedSeats();
         }
@@ -71,7 +74,6 @@ export default function CheckoutBar({ onProceed, activeShowtime }) {
 
     setLoading(true);
 
-    // Ensure Razorpay SDK script is present
     const isScriptLoaded = await loadRazorpayScript();
     if (!isScriptLoaded) {
       alert('Razorpay SDK failed to load. Are you online?');
@@ -80,8 +82,8 @@ export default function CheckoutBar({ onProceed, activeShowtime }) {
     }
 
     try {
-      // 1. Fetch Razorpay Order ID from backend
-      const orderRes = await fetch('http://localhost:4000/api/payment/create-order', {
+      // ✅ FIX: Dynamic API_URL usage
+      const orderRes = await fetch(`${API_URL}/api/payment/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: totalPrice }),
@@ -104,7 +106,6 @@ export default function CheckoutBar({ onProceed, activeShowtime }) {
         description: `Booking for ${activeShowtime?.movieTitle || activeShowtime?.title || 'Event'}`,
         order_id: orderData.order.id,
         handler: async function (response) {
-          // Payment Success Callback
           console.log("Payment Successful:", response.razorpay_payment_id);
           await saveBookingToDB(response.razorpay_payment_id);
         },
@@ -114,11 +115,11 @@ export default function CheckoutBar({ onProceed, activeShowtime }) {
           contact: "9999999999",
         },
         theme: {
-          color: "#e11d48", // Rose Theme
+          color: "#e11d48",
         },
         modal: {
           ondismiss: function () {
-            setLoading(false); // Re-enable button if user exits gateway modal
+            setLoading(false);
           }
         }
       };

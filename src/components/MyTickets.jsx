@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 
+// ✅ Base API URL declaration
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
 export default function MyTickets() {
   const { user } = useAuthStore();
   const [tickets, setTickets] = useState([]);
@@ -15,7 +18,8 @@ export default function MyTickets() {
       }
 
       try {
-        const res = await fetch(`http://localhost:4000/api/bookings/${encodeURIComponent(user.email)}`);
+        // ✅ FIX: Template literal and API_URL variable
+        const res = await fetch(`${API_URL}/api/bookings/${encodeURIComponent(user.email)}`);
         const data = await res.json();
 
         if (res.ok) {
@@ -46,7 +50,8 @@ export default function MyTickets() {
     if (!confirmCancel) return;
 
     try {
-      const res = await fetch('http://localhost:4000/api/bookings/cancel', {
+      // ✅ FIX: Dynamic API_URL usage
+      const res = await fetch(`${API_URL}/api/bookings/cancel`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

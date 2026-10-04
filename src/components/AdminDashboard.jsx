@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
 export default function AdminDashboard({ onBack }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchStats = () => {
-    fetch('http://localhost:4000/api/admin/stats')
+    // ✅ FIX: Dynamic API_URL ka correct variable use
+    fetch(`${API_URL}/api/admin/stats`)
       .then((res) => res.json())
       .then((data) => setStats(data))
       .catch((err) => console.error('Error loading admin stats:', err))
